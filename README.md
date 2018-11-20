@@ -1,10 +1,12 @@
-#File uploader example for play framework
+# File uploader example
 
-To run it in dev mode you should have JDK installed, then type
+This project is written on Play framework and uses docker compose to run it.
+
+To launch it please type
 
 ```
-sbt run
+docker-compose up
 ```
 
-then go to ``localhost:9000``
+Wait some time and then go to ``[hostname]:9000``
 
