@@ -1,0 +1,6 @@
+GET         /*path/                          controllers.Untrailer.untrail(path: String)
+GET         /assets/*file                    controllers.Assets.at(path="/public", file)
+
+GET         /                                controllers.Index.index
+POST        /upload                          controllers.Api.upload
+GET         /preview/:hash                   controllers.Api.preview(hash: String)

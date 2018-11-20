@@ -1,0 +1,111 @@
+@import helper._
+
+@helper.javascriptRouter("routePreview")(
+    routes.javascript.Api.preview
+)
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>File uploader</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href='https://fonts.googleapis.com/css?family=Play&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+        <script src="@routes.Assets.at("lib/jquery/jquery.min.js")"></script>
+
+        <style>
+            body {
+                color: #363F49;
+                font-family: Play, Arial, sans-serif;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 1.471;
+            }
+            input[type="submit"] {
+                margin-top: 1em;
+                display: block;
+            }
+            textarea {
+                padding: 0;
+            }
+            textarea, input[type="text"] {
+                width: 50%
+            }
+            span {
+                color: red;
+            }
+            img {
+                padding: 1em 1em 0 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h3>File uploader</h3>
+        <fieldset>
+            <legend>Multiple upload</legend>
+            <form enctype="multipart/form-data">
+                <input type="file" name="img" multiple>
+                <input type="submit">
+            </form>
+        </fieldset>
+        <fieldset>
+            <legend>From link</legend>
+            <form>
+                <input type="text" name="link" value="https://habrastorage.org/webt/_5/ev/dk/_5evdkq_9xq33obh4kdutkjf6i4.jpeg">
+                <input type="submit">
+             </form>
+        </fieldset>
+        <fieldset>
+            <legend>From JSON</legend>
+            <form data-type="json">
+                <textarea rows="10">{"img": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAADdcAAA3XAUIom3gAAAAHdElNRQfiCxQQLSwxJ3SMAAAA4klEQVQoz33Qvy5DARTH8U9vckUirRquF2C4i8UziKSDRGogJm/Q4gGExWZittoMWIwkUpOmQhoWs2ik/qQsvQaVuLfqu53z+55zkkOaSMODTQPZVlfxbHmQ0LCGA7s/jSAVz4odIif5a3rCky2E2laMZuPIvSM5zEgkEtcWoehYU9OjuiIYE4vF1r0qsNTzdxT6jraUAsO94sxLJi7LuwgMpuNT+z9hwVX2D2lCN99CR0W3Lx4354TAm1AsMK9k6JcwreuUnBF7YoSmfLhUU9MyqercanppXtm+W+8SdzZE8AVgHzmHuj9lWQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0xMS0yMFQxNjo0NTo0NCswMTowMAYgmfcAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMTEtMjBUMTY6NDU6NDQrMDE6MDB3fSFLAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAABJRU5ErkJggg=="}</textarea>
+                <input type="submit">
+            </form>
+        </fieldset>
+        <script language="JavaScript">
+            $(document).ready(function () {
+              $('input[type=submit]').click(function (event) {
+                    event.preventDefault();
+                    $form = $(this).parents('form');
+                    $form.find('span').remove();
+
+                    var isJson = $form.data('type') === 'json';
+                    var data = isJson ? $form.find('textarea').val() : new FormData($form[0]);
+
+                    var opts = isJson ? {
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json"
+                    } : {
+                        contentType: false
+                    };
+
+                    $.ajax($.extend({}, {
+                        url: '@routes.Api.upload()',
+                        type: 'POST',
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log(textStatus);
+                            $form.append("<span>Error</span>");
+                        },
+                        success: function (data) {
+                            if(data) {
+                                $.each(data.items, function(i, hash) {
+                                    $form.append("<img src='" + routePreview.controllers.Api.preview(hash).url + "'>");
+                                });
+                            }
+                        },
+                        data: data,
+                        cache: false,
+                        processData: false
+                    }, opts ));
+                    return false;
+              })
+            })
+        </script>
+    </body>
+</html>
