@@ -3,4 +3,4 @@ GET         /assets/*file                    controllers.Assets.at(path="/public
 
 GET         /                                controllers.Index.index
 POST        /upload                          controllers.Api.upload
-GET         /preview/:hash                   controllers.Api.preview(hash: String)
+

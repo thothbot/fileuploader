@@ -1,9 +1,3 @@
-@import helper._
-
-@helper.javascriptRouter("routePreview")(
-    routes.javascript.Api.preview
-)
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -94,8 +88,8 @@
                         },
                         success: function (data) {
                             if(data) {
-                                $.each(data.items, function(i, hash) {
-                                    $form.append("<img src='" + routePreview.controllers.Api.preview(hash).url + "'>");
+                                $.each(data.items, function(i, link) {
+                                    $form.append("<img src='" + link + "'>");
                                 });
                             }
                         },

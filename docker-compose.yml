@@ -1,10 +1,36 @@
 version: "2"
 services:
+    minio:
+        image: minio/minio
+        ports:
+            - "9001:9000"
+        environment:
+            MINIO_ACCESS_KEY: miniokey
+            MINIO_SECRET_KEY: miniosecret
+        volumes:
+            - ./minio:/data
+        command: ["server", "/data"]
+    createbuckets:
+        image: minio/mc
+        depends_on:
+            - minio
+        entrypoint: >
+            /bin/sh -c "
+            while ! /usr/bin/nc minio 9000; do sleep 2s; done;
+            /usr/bin/mc config host add myminio http://minio:9000 miniokey miniosecret;
+            /usr/bin/mc mb myminio/upload;
+            /usr/bin/mc policy download myminio/upload;
+            /usr/bin/mc mb myminio/preview;
+            /usr/bin/mc policy download myminio/preview;
+            exit 0;
+            "
     web:
         image: thothbot/alpine-sbt
-        command: sbt run
-        ports:
-            - "9000:9000"
+        command: sbt ~run
         volumes:
             - .:/app
         stdin_open: true
+        ports:
+            - "9000:9000"
+        depends_on:
+            - minio
